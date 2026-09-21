@@ -2,13 +2,19 @@ const express = require("express");
 
 const app = express();
 
-app.use("/dashboard", (req, res) => {
-  res.send("Welcome to Dashboard");
-});
-app.use("/signin", (req, res) => {
-  res.send(" Sign In");
-});
+app.get(
+  "/user",
+  (req, res, next) => {
+    console.log("Handling the rout user");
+    next();
+    //res.send("Get User List");
+  },
+  (req, res) => {
+    console.log("Handling route user2");
+    res.send("User List2");
+  },
+);
 
-app.listen(3000, () => {
-  console.log("Server is successfully listen on port 3000");
+app.listen(3001, () => {
+  console.log("Server is successfully listen on port 3001");
 });
