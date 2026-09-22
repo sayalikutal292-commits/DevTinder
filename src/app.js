@@ -11,6 +11,16 @@ app.get("/admin/delete", (req, res) => {
   res.send("Delet data for Admin");
 });
 
+app.get("/getUserData", (req, res) => {
+  try {
+    res.send("Get data");
+  } catch (err) {
+    if (err) {
+      res.status(500).send("Something went wrong!!!");
+    }
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is successfully listen on port 3001");
 });
