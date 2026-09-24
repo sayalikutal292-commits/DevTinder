@@ -20,8 +20,7 @@ app.get("/users", async (req, res) => {
 
 app.get("/user", async (req, res) => {
   try {
-    const user = await User.findOne({ emailId: req.body.emailId });
-    console.log(user);
+    const user = await User.findOne({ _id: req.body.emailId });
     if (user === null) {
       res.send("User not found");
     } else {
@@ -32,6 +31,7 @@ app.get("/user", async (req, res) => {
   }
 });
 
+// creating a user
 app.post("/signup", async (req, res) => {
   // creating a new instance of the user model
   const user = new User(req.body);
@@ -42,6 +42,45 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("Error saving data" + err.message);
   }
 });
+
+// Delete one user
+app.delete("/user", async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const isDeleted = await User.findByIdAndDelete(userId);
+    if (isDeleted === null) {
+      res.send("User not found");
+    } else {
+      res.send("User deleted successfully!!");
+    }
+  } catch (err) {
+    res.send("Something went wrong!!!");
+  }
+});
+
+// update user
+
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  const ALLOWED_UPDATE = ["skills, gender"];
+  const isUpdateAllowed = Object.keys(data).every((k) => {
+    ALLOWED_UPDATE.includes(k);
+  });
+  try {
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed");
+    }
+    await User.findByIdAndUpdate({ _id: userId }, data, {
+      runValidators: true,
+    });
+    res.send("Upadetd successfully");
+  } catch (err) {
+    res.status(400).send("Something went wrong: " + err.message);
+    console.log("Something went wrong!!!" + err.message);
+  }
+});
+
 connectDB()
   .then(() => {
     console.log("Database connection established...");
