@@ -3,8 +3,56 @@ const { auth } = require("./middleware/auth");
 const app = express();
 const connectDB = require("./Config/database.js");
 const User = require("./models/user.js");
-
+const { validateSignup } = require("./utils/validation.js");
+const bcrypt = require("bcrypt");
+const validator = require("validator");
 app.use(express.json());
+
+// creating a user
+app.post("/signup", async (req, res) => {
+  // creating a new instance of the user model
+  // validate data
+  // encypt the password
+  const { firstName, lastName, emailId, password } = req.body;
+
+  try {
+    validateSignup(req);
+    const encryptedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: encryptedPassword,
+    });
+    await user.save();
+    res.send("User added succesfully!!");
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
+  }
+});
+
+// Login user
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    if (!validator.isEmail(emailId)) {
+      throw new Error("Invalid credentials");
+    }
+    const user = await User.findOne({ emailId: emailId });
+    console.log(user);
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (isPasswordValid) {
+      res.send("login Successfully");
+    } else {
+      res.send("Invalid credentials");
+    }
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
+  }
+});
 
 // get all user data
 app.get("/users", async (req, res) => {
@@ -28,18 +76,6 @@ app.get("/user", async (req, res) => {
     }
   } catch (err) {
     res.status(400).send("Something went wrong!!");
-  }
-});
-
-// creating a user
-app.post("/signup", async (req, res) => {
-  // creating a new instance of the user model
-  const user = new User(req.body);
-  try {
-    await user.save();
-    res.send("User added succesfully!!");
-  } catch (err) {
-    res.status(400).send("Error saving data" + err.message);
   }
 });
 
