@@ -39,11 +39,15 @@ const userSchema = new Schema(
     },
     gender: {
       type: String,
-      validate(val) {
-        if (!["Male", "Female", "Other"].includes(val)) {
-          throw new Error("Geneder data is not valide");
-        }
+      enum: {
+        values: ["Male", "Female", "Other"],
+        message: `$VALUES is incorrect gender type`,
       },
+      // validate(val) {
+      //   if (!["Male", "Female", "Other"].includes(val)) {
+      //     throw new Error("Geneder data is not valide");
+      //   }
+      // },
     },
     skills: {
       type: [String],
