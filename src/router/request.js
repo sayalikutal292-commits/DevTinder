@@ -75,7 +75,6 @@ router.post(
         toUserId: loggedInUser._id,
         status: "interested",
       });
-      console.log(connectionRequest);
       if (!connectionRequest) {
         throw new Error("Connection not found");
       }
